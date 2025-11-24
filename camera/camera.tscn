@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://2gpkhql8j5ji"]
 
-[ext_resource type="Script" uid="uid://cvfoc4eweor4e" path="res://camera.gd" id="1_u5kg4"]
+[ext_resource type="Script" uid="uid://itv1hjfrf72a" path="res://camera/camera.gd" id="1_lw1ob"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -9,7 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_u5kg4")
+script = ExtResource("1_lw1ob")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 0
