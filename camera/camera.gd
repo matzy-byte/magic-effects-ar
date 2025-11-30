@@ -1,9 +1,13 @@
+class_name Camera
 extends Control
 
 var camera_extension := CameraServerExtension.new()
 var camera_feed
+var running_mode := MediaPipeVisionTask.RUNNING_MODE_IMAGE
+var request: HTTPRequest
+var delegate := MediaPipeTaskBaseOptions.DELEGATE_CPU
 
-@onready var camera_texture := $TextureRect
+@onready var camera_texture: TextureRect = $TextureRect
 
 func _ready():
     CameraServer.monitoring_feeds = true
@@ -18,9 +22,18 @@ func _ready():
         _init_camera_feed()
         camera_extension.permission_result.connect(_on_permission_result)
         camera_extension.request_permission()
-    
 
+func _reset() -> void:
+    if camera_feed == null:
+        return
+    camera_feed.feed_is_active = false
+    if camera_feed.format_changed.is_connected(self._camera_format_changed):
+        camera_feed.format_changed.disconnect(self._camera_format_changed)
+    if camera_feed.frame_changed.is_connected(self._camera_frame_changed):
+        camera_feed.frame_changed.disconnect(self._camera_frame_changed)
+    
 func _init_camera_feed():
+    _reset()
     if CameraServer.get_feed_count() == 0:
         print("No camera feed found")
         return
@@ -38,33 +51,71 @@ func _init_camera_feed():
                 print("Setting format to: ", format, "-->", success)
                 break
 
+        if camera_feed == null:
+            return
+        if camera_feed.get_position() == CameraFeed.FEED_BACK:
+            camera_texture.flip_h = false
+        else:
+            camera_texture.flip_h = true
+        camera_feed.format_changed.connect(self._camera_format_changed, ConnectFlags.CONNECT_DEFERRED)
+        camera_feed.frame_changed.connect(self._camera_frame_changed, ConnectFlags.CONNECT_DEFERRED)
         camera_feed.feed_is_active = true
-        var frame_size := Vector2i.ZERO
-        match camera_feed.get_datatype():
-            CameraFeed.FEED_RGB:
-                print("Type: RGB")
-                var texture = CameraTexture.new()
-                texture.camera_feed_id = camera_feed.get_id()
-                texture.which_feed = CameraServer.FEED_RGBA_IMAGE
-                frame_size = texture.get_size()
-                camera_texture.texture = texture
-                # flip_h = true  
-            CameraFeed.FEED_YCBCR:
-                print("Type: YCBCR")
-            CameraFeed.FEED_YCBCR_SEP:
-                print("Type: YCBR_SEP")
-            _:
-                return
-        
-        var feed_rotation: float = camera_feed.feed_transform.get_rotation()
-        camera_texture.flip_h = true
-        var size_rotated := Vector2(frame_size).rotated(feed_rotation)
-        var offset_num := Vector2(min(size_rotated.x, 0), min(size_rotated.y, 0))
-        rotation = feed_rotation
-        position = offset_num * -1
+        _camera_format_changed()
 
-        print("CameraFeed active:", camera_feed.feed_is_active)
-        print("Transform:", camera_feed.feed_transform)
         print("Camera feed initialized and applied.")
     else:
         print("CameraFeed Type is not Extension.")
+
+func _camera_format_changed() -> void:
+    if camera_feed == null:
+        return
+    var frame_size := Vector2i.ZERO
+    match camera_feed.get_datatype():
+        CameraFeed.FEED_RGB:
+            print("Type: RGB")
+            var texture = CameraTexture.new()
+            texture.camera_feed_id = camera_feed.get_id()
+            texture.which_feed = CameraServer.FEED_RGBA_IMAGE
+            frame_size = texture.get_size()
+            print("Frame size: ", frame_size)
+            camera_texture.texture = texture
+            # flip_h = true  
+        CameraFeed.FEED_YCBCR:
+            print("Type: YCBCR")
+        CameraFeed.FEED_YCBCR_SEP:
+            print("Type: YCBR_SEP")
+        _:
+            return
+        
+    var feed_rotation: float = camera_feed.feed_transform.get_rotation()
+    camera_texture.flip_h = true
+    var size_rotated := Vector2(frame_size).rotated(feed_rotation)
+    var offset_num := Vector2(min(size_rotated.x, 0), min(size_rotated.y, 0))
+    rotation = feed_rotation
+    position = offset_num * -1
+
+func _camera_frame_changed() -> void:
+    if camera_texture == null:
+        return
+    await RenderingServer.frame_post_draw
+    var texture := camera_texture.get_texture()
+    if texture == null:
+        return
+    var image = texture.get_image()
+    if image == null:
+        return
+    if delegate == MediaPipeTaskBaseOptions.DELEGATE_GPU:
+        image.convert(Image.FORMAT_RGBA8)
+    else:
+        image.convert(Image.FORMAT_RGB8)
+    var img := MediaPipeImage.new()
+    img.set_image(image)
+    _camera_frame(img)
+
+func _camera_frame(image: MediaPipeImage) -> void:
+    if delegate == MediaPipeTaskBaseOptions.DELEGATE_CPU and image.is_gpu_image():
+        image.convert_to_cpu()
+    _process_camera(image, Time.get_ticks_msec())
+
+func _process_camera(_image: MediaPipeImage, _timestamp_ms: int) -> void:
+    pass
