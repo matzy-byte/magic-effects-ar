@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://2gpkhql8j5ji"]
 
-[ext_resource type="Script" uid="uid://itv1hjfrf72a" path="res://camera/camera.gd" id="1_lw1ob"]
+[ext_resource type="Script" uid="uid://sw74on74u1bj" path="res://camera/gesture_recognizer.gd" id="1_lw1ob"]
 
 [node name="Control" type="Control"]
 layout_mode = 3

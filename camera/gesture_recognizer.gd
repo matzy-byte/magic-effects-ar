@@ -9,7 +9,7 @@ var renderer: MediaPipeHandRenderer
 func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
     show_result(image, result)
 
-func _init_task() -> void:
+func _ready() -> void:
     var file := get_model(task_file)
     if file == null:
         return
@@ -20,11 +20,12 @@ func _init_task() -> void:
     task.initialize(base_options, running_mode)
     task.result_callback.connect(self._result_callback)
     renderer = MediaPipeHandRenderer.new()
-    # super()
+    super()
 
 func _process_camera(image: MediaPipeImage, timestamp_ms: int) -> void:
     print("Function to process camera started.")
-    task.recognize_async(image, timestamp_ms)
+    if image != null:
+        task.recognize_async(image, timestamp_ms)
 
 func show_result(image: MediaPipeImage, result: MediaPipeGestureRecognizerResult) -> void:
     var gesture_text := ""
@@ -39,9 +40,9 @@ func show_result(image: MediaPipeImage, result: MediaPipeGestureRecognizerResult
         var hand_label: String = classification_hand.category_name
         var hand_score: float = classification_hand.score
         gesture_text += "%s: %.2f\n%s: %.2f\n\n" % [hand_label, hand_score, gesture_label, gesture_score]
-    lbl_gesture.call_deferred("set_text", gesture_text)
-    var output_image := renderer.render(image, result.hand_landmarks)
-    # update_image(output_image.image)
+    # lbl_gesture.call_deferred("set_text", gesture_text)
+    print("Gesture: ", gesture_text)
+    return
 
 func get_model(path: String) -> FileAccess:
     if FileAccess.file_exists(path):
