@@ -44,6 +44,7 @@ func show_result(image: MediaPipeImage, result: MediaPipeGestureRecognizerResult
     print("Gesture: ", gesture_text)
     return
 
+
 func get_model(path: String) -> FileAccess:
     if FileAccess.file_exists(path):
         return FileAccess.open(path, FileAccess.READ)
