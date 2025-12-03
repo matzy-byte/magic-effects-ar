@@ -4,7 +4,9 @@ var task: MediaPipeGestureRecognizer
 var task_file := "camera/gesture_recognizer.task"
 var renderer: MediaPipeHandRenderer
 
-@onready var lbl_gesture: Label = $Gesture
+var arr_gestures: Array = []
+var arr_gestures_name := []
+
 
 func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
     show_result(image, result)
@@ -23,12 +25,11 @@ func _ready() -> void:
     super()
 
 func _process_camera(image: MediaPipeImage, timestamp_ms: int) -> void:
-    print("Function to process camera started.")
     if image != null:
         task.recognize_async(image, timestamp_ms)
 
-func show_result(image: MediaPipeImage, result: MediaPipeGestureRecognizerResult) -> void:
-    var gesture_text := ""
+func show_result(_image: MediaPipeImage, result: MediaPipeGestureRecognizerResult) -> void:
+    var _gesture_text := ""
     assert(result.gestures.size() == result.handedness.size())
     for i in range(result.gestures.size()):
         var gesture := result.gestures[i]
@@ -37,11 +38,21 @@ func show_result(image: MediaPipeImage, result: MediaPipeGestureRecognizerResult
         var classification_hand := hand.categories[0]
         var gesture_label: String = classification_gesture.category_name
         var gesture_score: float = classification_gesture.score
+        
+        var gesture_name = gesture_label.split(" ")[0]
+        if arr_gestures.back() != gesture_label:
+            calcluate_effect()
+            if len(arr_gestures) > 10:
+                arr_gestures.clear()
+            arr_gestures.append(gesture_label)
+            arr_gestures_name.append(gesture_name)
+
+            print("Gesture: ", arr_gestures.back())
+            print("Accuracy: ", gesture_score)
+
         var hand_label: String = classification_hand.category_name
         var hand_score: float = classification_hand.score
-        gesture_text += "%s: %.2f\n%s: %.2f\n\n" % [hand_label, hand_score, gesture_label, gesture_score]
-    # lbl_gesture.call_deferred("set_text", gesture_text)
-    print("Gesture: ", gesture_text)
+        _gesture_text += "%s: %.2f\n%s: %.2f\n\n" % [hand_label, hand_score, gesture_label, gesture_score]
     return
 
 
@@ -49,3 +60,13 @@ func get_model(path: String) -> FileAccess:
     if FileAccess.file_exists(path):
         return FileAccess.open(path, FileAccess.READ)
     return null
+
+func calcluate_effect() -> void:
+    var fire_effect := ["fist", "point"]
+
+    print(arr_gestures_name.slice(-2))
+    if arr_gestures_name.slice(-2) == fire_effect:
+        print("Effect: Fire!")
+
+
+        
