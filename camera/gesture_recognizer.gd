@@ -6,10 +6,13 @@ var renderer: MediaPipeHandRenderer
 
 var arr_gestures: Array = []
 var arr_gestures_name := []
+var left_hand_landmarks = []
+var right_hand_landmarks = []
 
 
 func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
     show_result(image, result)
+    update_from_mediapipe(result)
 
 func _ready() -> void:
     var file := get_model(task_file)
@@ -47,14 +50,10 @@ func show_result(_image: MediaPipeImage, result: MediaPipeGestureRecognizerResul
             arr_gestures.append(gesture_label)
             arr_gestures_name.append(gesture_name)
 
-            print("Gesture: ", arr_gestures.back())
-            print("Accuracy: ", gesture_score)
-
         var hand_label: String = classification_hand.category_name
         var hand_score: float = classification_hand.score
         _gesture_text += "%s: %.2f\n%s: %.2f\n\n" % [hand_label, hand_score, gesture_label, gesture_score]
     return
-
 
 func get_model(path: String) -> FileAccess:
     if FileAccess.file_exists(path):
@@ -68,5 +67,23 @@ func calcluate_effect() -> void:
     if arr_gestures_name.slice(-2) == fire_effect:
         print("Effect: Fire!")
 
+func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
+    left_hand_landmarks.clear()
+    right_hand_landmarks.clear()
 
-        
+    assert(result.gestures.size() == result.handedness.size())
+    for i in range(result.gestures.size()):
+        var hand_lms = result.hand_landmarks[i].landmarks
+
+        var hand_array = []
+        for j in range(hand_lms.size()):
+            var lm = hand_lms[j]
+            hand_array.append(Vector3(lm.x, lm.y, lm.z))
+
+        var handedness := result.handedness[i] 
+        var classification_hand := handedness.categories[0]
+        var hand_label: String = classification_hand.category_name
+        if hand_label == "Left":
+            left_hand_landmarks = hand_array
+        else:
+            right_hand_landmarks = hand_array
