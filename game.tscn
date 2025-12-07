@@ -1,0 +1,76 @@
+[gd_scene load_steps=5 format=3 uid="uid://cven0gqakic7t"]
+
+[ext_resource type="Script" uid="uid://b6l4uoobca7pj" path="res://game_ui.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://bsxk3snf4leyw" path="res://game.gd" id="1_e2o6t"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mwb40"]
+size = Vector2(8, 4.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mwb40"]
+
+[node name="game" type="Node3D"]
+script = ExtResource("1_e2o6t")
+
+[node name="camera" type="Camera3D" parent="."]
+
+[node name="real_camera" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -2.8)
+mesh = SubResource("PlaneMesh_mwb40")
+surface_material_override/0 = SubResource("StandardMaterial3D_mwb40")
+
+[node name="game_ui" type="Control" parent="." node_paths=PackedStringArray("debug_effect", "debug_effect_location", "debug_gesture", "debug_hand_location")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_80nbo")
+debug_effect = NodePath("debug_list/debug_effect")
+debug_effect_location = NodePath("debug_list/debug_effect_location")
+debug_gesture = NodePath("debug_list/debug_gesture")
+debug_hand_location = NodePath("debug_list/debug_hand_location")
+
+[node name="exit_button" type="Button" parent="game_ui"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -44.0
+offset_right = 51.0
+offset_bottom = -13.0
+grow_vertical = 0
+size_flags_vertical = 3
+text = "Exit"
+
+[node name="debug_list" type="VBoxContainer" parent="game_ui"]
+layout_mode = 0
+offset_right = 178.0
+offset_bottom = 189.0
+
+[node name="debug_effect" type="Label" parent="game_ui/debug_list"]
+layout_mode = 2
+
+[node name="debug_effect_location" type="Label" parent="game_ui/debug_list"]
+layout_mode = 2
+
+[node name="debug_gesture" type="Label" parent="game_ui/debug_list"]
+layout_mode = 2
+
+[node name="debug_hand_location" type="Label" parent="game_ui/debug_list"]
+layout_mode = 2
+
+[node name="points" type="Label" parent="game_ui"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -146.0
+offset_top = 23.0
+offset_right = -23.0
+offset_bottom = 46.0
+grow_horizontal = 0
+text = "Punktzahl: 1000"
+
+[connection signal="pressed" from="game_ui/exit_button" to="game_ui" method="_on_exit_button_pressed"]

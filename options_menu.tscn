@@ -1,0 +1,69 @@
+[gd_scene load_steps=3 format=3 uid="uid://di8duc2me3uxp"]
+
+[ext_resource type="LabelSettings" uid="uid://cyvuouoaaauqw" path="res://themes/text_title.tres" id="1_lbr8e"]
+[ext_resource type="Script" uid="uid://ch0pijoe8dwl4" path="res://options_menu.gd" id="1_t1lix"]
+
+[node name="options_menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_t1lix")
+
+[node name="title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -166.0
+offset_top = 55.0
+offset_right = 166.0
+offset_bottom = 113.0
+grow_horizontal = 2
+text = "Options"
+label_settings = ExtResource("1_lbr8e")
+
+[node name="menu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="label_audio" type="Label" parent="menu"]
+layout_mode = 2
+text = "Audio"
+
+[node name="slider_audio" type="HSlider" parent="menu"]
+layout_mode = 2
+rounded = true
+
+[node name="label_resolution" type="Label" parent="menu"]
+layout_mode = 2
+text = "Resolution"
+
+[node name="options_resolution" type="OptionButton" parent="menu"]
+layout_mode = 2
+
+[node name="back_button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -61.0
+offset_right = 77.0
+offset_bottom = -30.0
+grow_vertical = 0
+text = "Back"
+
+[connection signal="pressed" from="back_button" to="." method="_on_back_button_pressed"]
