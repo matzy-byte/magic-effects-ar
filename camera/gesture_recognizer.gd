@@ -49,6 +49,7 @@ func show_result(_image: MediaPipeImage, result: MediaPipeGestureRecognizerResul
                 arr_gestures.clear()
             arr_gestures.append(gesture_label)
             arr_gestures_name.append(gesture_name)
+            print(arr_gestures_name.back())
 
         var hand_label: String = classification_hand.category_name
         var hand_score: float = classification_hand.score
@@ -63,7 +64,7 @@ func get_model(path: String) -> FileAccess:
 func calcluate_effect() -> void:
     var fire_effect := ["fist", "point"]
 
-    print(arr_gestures_name.slice(-2))
+    # print(arr_gestures_name.slice(-2))
     if arr_gestures_name.slice(-2) == fire_effect:
         print("Effect: Fire!")
 

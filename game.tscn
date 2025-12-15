@@ -1,17 +1,25 @@
-[gd_scene load_steps=5 format=3 uid="uid://cven0gqakic7t"]
+[gd_scene load_steps=7 format=3 uid="uid://cven0gqakic7t"]
 
 [ext_resource type="Script" uid="uid://b6l4uoobca7pj" path="res://game_ui.gd" id="1_80nbo"]
 [ext_resource type="Script" uid="uid://bsxk3snf4leyw" path="res://game.gd" id="1_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://2gpkhql8j5ji" path="res://camera/camera.tscn" id="3_feb5d"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_mwb40"]
 size = Vector2(8, 4.5)
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_feb5d"]
+viewport_path = NodePath("SubViewport")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mwb40"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_feb5d")
 
 [node name="game" type="Node3D"]
 script = ExtResource("1_e2o6t")
 
 [node name="camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.09266424)
+size = 4.5
 
 [node name="real_camera" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -2.8)
@@ -72,5 +80,10 @@ offset_right = -23.0
 offset_bottom = 46.0
 grow_horizontal = 0
 text = "Punktzahl: 1000"
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(1280, 720)
+
+[node name="Control" parent="SubViewport" instance=ExtResource("3_feb5d")]
 
 [connection signal="pressed" from="game_ui/exit_button" to="game_ui" method="_on_exit_button_pressed"]

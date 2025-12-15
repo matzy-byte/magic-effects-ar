@@ -11,6 +11,5 @@ config_version=5
 [application]
 
 config/name="magic-effects-ar"
-run/main_scene="uid://dw3k6krikq6ad"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
