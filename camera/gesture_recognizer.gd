@@ -1,4 +1,4 @@
-extends Camera
+extends WebCamera
 
 var task: MediaPipeGestureRecognizer
 var task_file := "camera/gesture_recognizer.task"
@@ -9,10 +9,21 @@ var arr_gestures_name := []
 var left_hand_landmarks = []
 var right_hand_landmarks = []
 
+var center_pos := Vector3.ZERO
+var center_vp := Vector2.ZERO
+var point_pos := Vector2.ZERO
+
+func _draw():
+    # print(center_vp)
+    draw_circle(center_vp, 75, Color.RED)
 
 func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
     show_result(image, result)
+    call_deferred("_apply_mediapipe_update", result)
+
+func _apply_mediapipe_update(result):    
     update_from_mediapipe(result)
+    queue_redraw() 
 
 func _ready() -> void:
     var file := get_model(task_file)
@@ -88,3 +99,31 @@ func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
             left_hand_landmarks = hand_array
         else:
             right_hand_landmarks = hand_array
+        
+        center_pos = calculate_hand_center()
+        center_vp = Vector2((1.0 - center_pos.x) * vp.size.x, center_pos.y * vp.size.y)  
+
+func calculate_hand_center() -> Vector3: 
+    var result := Vector3.ZERO
+    if left_hand_landmarks.size() > 0:
+        for i in left_hand_landmarks:
+            result.x += i.x
+            result.y += i.y
+            result.z += i.z
+
+        result.x = result.x / left_hand_landmarks.size()
+        result.y = result.y / left_hand_landmarks.size()
+        result.z = result.z / left_hand_landmarks.size()
+        
+        return result
+    else:
+        for i in right_hand_landmarks:
+            result.x += i.x
+            result.y += i.y
+            result.z += i.z
+
+        result.x = result.x / left_hand_landmarks.size()
+        result.y = result.y / left_hand_landmarks.size()
+        result.z = result.z / left_hand_landmarks.size()
+        
+        return result

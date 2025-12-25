@@ -1,4 +1,4 @@
-class_name Camera
+class_name WebCamera
 extends Control
 
 var camera_extension := CameraServerExtension.new()
@@ -6,10 +6,14 @@ var camera_feed
 var running_mode := MediaPipeVisionTask.RUNNING_MODE_LIVE_STREAM
 var request: HTTPRequest
 var delegate := MediaPipeTaskBaseOptions.DELEGATE_CPU
+var rect_size := Vector2.ZERO
 
 @onready var camera_texture: TextureRect = $TextureRect
+@onready var vp = get_parent() as SubViewport
 
 func _ready():
+    rect_size = get_viewport().size
+    print(rect_size)
     CameraServer.monitoring_feeds = true
 
     if camera_extension.permission_granted():
