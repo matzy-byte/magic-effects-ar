@@ -1,8 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://cven0gqakic7t"]
+[gd_scene load_steps=17 format=3 uid="uid://cven0gqakic7t"]
 
 [ext_resource type="Script" uid="uid://b6l4uoobca7pj" path="res://game_ui.gd" id="1_80nbo"]
 [ext_resource type="Script" uid="uid://bsxk3snf4leyw" path="res://game.gd" id="1_e2o6t"]
 [ext_resource type="PackedScene" uid="uid://2gpkhql8j5ji" path="res://camera/camera.tscn" id="3_feb5d"]
+[ext_resource type="PackedScene" uid="uid://cgajuhykrf0bj" path="res://enemy/enemy.tscn" id="4_fc0e3"]
+[ext_resource type="AudioStream" uid="uid://dsmw7j5gc5so6" path="res://audio/hit_sfx.wav" id="5_7jktm"]
+[ext_resource type="AudioStream" uid="uid://duk5ir4e5ds7" path="res://audio/create_spell_sfx.wav" id="6_ryrav"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_mwb40"]
 size = Vector2(8, 4.5)
@@ -12,10 +15,38 @@ viewport_path = NodePath("SubViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mwb40"]
 resource_local_to_scene = true
+shading_mode = 0
 albedo_texture = SubResource("ViewportTexture_feb5d")
 
-[node name="game" type="Node3D"]
+[sub_resource type="LabelSettings" id="LabelSettings_fc0e3"]
+font_size = 25
+
+[sub_resource type="Gradient" id="Gradient_feb5d"]
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fc0e3"]
+gradient = SubResource("Gradient_feb5d")
+
+[sub_resource type="Gradient" id="Gradient_7jktm"]
+colors = PackedColorArray(0.27450982, 0.99607843, 0, 1, 0.26666665, 1, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ryrav"]
+gradient = SubResource("Gradient_7jktm")
+
+[sub_resource type="LabelSettings" id="LabelSettings_feb5d"]
+font_size = 32
+font_color = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_feb5d"]
+
+[node name="game" type="Node3D" node_paths=PackedStringArray("game_ui", "timer", "enemy", "enemy_hit_sound")]
 script = ExtResource("1_e2o6t")
+game_ui = NodePath("game_ui")
+timer = NodePath("Timer")
+enemy = NodePath("enemy")
+enemy_hit_sound = NodePath("enemy_hit_sound")
+
+[node name="Timer" type="Timer" parent="."]
 
 [node name="camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.09266424)
@@ -26,7 +57,7 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0
 mesh = SubResource("PlaneMesh_mwb40")
 surface_material_override/0 = SubResource("StandardMaterial3D_mwb40")
 
-[node name="game_ui" type="Control" parent="." node_paths=PackedStringArray("debug_effect", "debug_effect_location", "debug_gesture", "debug_hand_location")]
+[node name="game_ui" type="Control" parent="." node_paths=PackedStringArray("debug_effect", "debug_effect_location", "debug_gesture", "debug_hand_location", "time_value", "enemy_health")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,6 +69,8 @@ debug_effect = NodePath("debug_list/debug_effect")
 debug_effect_location = NodePath("debug_list/debug_effect_location")
 debug_gesture = NodePath("debug_list/debug_gesture")
 debug_hand_location = NodePath("debug_list/debug_hand_location")
+time_value = NodePath("time_value")
+enemy_health = NodePath("enemy_life")
 
 [node name="exit_button" type="Button" parent="game_ui"]
 layout_mode = 1
@@ -69,21 +102,93 @@ layout_mode = 2
 [node name="debug_hand_location" type="Label" parent="game_ui/debug_list"]
 layout_mode = 2
 
-[node name="points" type="Label" parent="game_ui"]
+[node name="time_label" type="Label" parent="game_ui"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -146.0
-offset_top = 23.0
-offset_right = -23.0
-offset_bottom = 46.0
+offset_left = -171.0
+offset_top = 32.0
+offset_right = -107.0
+offset_bottom = 67.0
 grow_horizontal = 0
-text = "Punktzahl: 1000"
+text = "Zeit:"
+label_settings = SubResource("LabelSettings_fc0e3")
+
+[node name="time_value" type="Label" parent="game_ui"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -86.0
+offset_top = 32.0
+offset_right = -22.0
+offset_bottom = 67.0
+grow_horizontal = 0
+text = "00:00"
+label_settings = SubResource("LabelSettings_fc0e3")
+horizontal_alignment = 2
+
+[node name="enemy_life" type="TextureProgressBar" parent="game_ui"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -309.5
+offset_top = 55.0
+offset_right = 309.5
+offset_bottom = 66.0
+grow_horizontal = 2
+value = 100.0
+rounded = true
+nine_patch_stretch = true
+texture_under = SubResource("GradientTexture1D_fc0e3")
+texture_progress = SubResource("GradientTexture1D_ryrav")
+
+[node name="enemy_name" type="Label" parent="game_ui"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -135.5
+offset_top = 4.0
+offset_right = 135.5
+offset_bottom = 49.0
+grow_horizontal = 2
+text = "Charles the Great"
+label_settings = SubResource("LabelSettings_feb5d")
 
 [node name="SubViewport" type="SubViewport" parent="."]
 size = Vector2i(1280, 720)
 
 [node name="Control" parent="SubViewport" instance=ExtResource("3_feb5d")]
 
+[node name="enemy_area" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8476984, -1.5558058)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="enemy_area"]
+shape = SubResource("SphereShape3D_feb5d")
+
+[node name="enemy" parent="." instance=ExtResource("4_fc0e3")]
+transform = Transform3D(0.315, 0, 0, 0, 0.2900985, 0.12275127, 0, -0.12275127, 0.2900985, 0, -1.2628586, -1.515)
+collision_layer = 0
+collision_mask = 0
+axis_lock_linear_x = true
+axis_lock_linear_y = true
+axis_lock_linear_z = true
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+
+[node name="enemy_hit_sound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.81424654, -1.6904781)
+stream = ExtResource("5_7jktm")
+max_distance = 3.5
+
+[node name="spell_spawn_sound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0011695623, -0.7186983)
+stream = ExtResource("6_ryrav")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 [connection signal="pressed" from="game_ui/exit_button" to="game_ui" method="_on_exit_button_pressed"]
+[connection signal="body_entered" from="enemy_area" to="." method="_on_enemy_hit"]
