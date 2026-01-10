@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://1wuuuya1chuf"]
+
+[ext_resource type="Script" uid="uid://beeb55p4bvl1b" path="res://spell/spell.gd" id="1_cbdtr"]
+[ext_resource type="AudioStream" uid="uid://cf1nt5f8yrre2" path="res://audio/fire_sfx.wav" id="2_aojo6"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_m3f8a"]
+
+[node name="spell" type="Area3D"]
+script = ExtResource("1_cbdtr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_m3f8a")
+
+[node name="spell_sound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("2_aojo6")
+max_distance = 3.0
