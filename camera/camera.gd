@@ -9,11 +9,12 @@ var delegate := MediaPipeTaskBaseOptions.DELEGATE_CPU
 var rect_size := Vector2.ZERO
 
 @onready var camera_texture: TextureRect = $TextureRect
-@onready var vp = get_parent() as SubViewport
+@onready var viewport = get_parent() as SubViewport
+@onready var overlay: Control = $Overlay
 
 func _ready():
-    rect_size = get_viewport().size
-    print(rect_size)
+    # rect_size = get_viewport().size
+    # print(rect_size)
     CameraServer.monitoring_feeds = true
 
     if camera_extension.permission_granted():

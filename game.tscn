@@ -1,8 +1,9 @@
-[gd_scene load_steps=17 format=3 uid="uid://cven0gqakic7t"]
+[gd_scene load_steps=18 format=3 uid="uid://cven0gqakic7t"]
 
 [ext_resource type="Script" uid="uid://b6l4uoobca7pj" path="res://game_ui.gd" id="1_80nbo"]
 [ext_resource type="Script" uid="uid://bsxk3snf4leyw" path="res://game.gd" id="1_e2o6t"]
 [ext_resource type="PackedScene" uid="uid://2gpkhql8j5ji" path="res://camera/camera.tscn" id="3_feb5d"]
+[ext_resource type="Script" uid="uid://bejaxk56g8fy5" path="res://overlay.gd" id="4_eow3j"]
 [ext_resource type="PackedScene" uid="uid://cgajuhykrf0bj" path="res://enemy/enemy.tscn" id="4_fc0e3"]
 [ext_resource type="AudioStream" uid="uid://dsmw7j5gc5so6" path="res://audio/hit_sfx.wav" id="5_7jktm"]
 [ext_resource type="AudioStream" uid="uid://duk5ir4e5ds7" path="res://audio/create_spell_sfx.wav" id="6_ryrav"]
@@ -162,6 +163,12 @@ label_settings = SubResource("LabelSettings_feb5d")
 size = Vector2i(1280, 720)
 
 [node name="Control" parent="SubViewport" instance=ExtResource("3_feb5d")]
+
+[node name="Overlay" type="Control" parent="SubViewport/Control"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("4_eow3j")
 
 [node name="enemy_area" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8476984, -1.5558058)

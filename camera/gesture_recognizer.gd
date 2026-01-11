@@ -6,24 +6,17 @@ var renderer: MediaPipeHandRenderer
 
 var arr_gestures: Array = []
 var arr_gestures_name := []
-var left_hand_landmarks = []
-var right_hand_landmarks = []
 
 var center_pos := Vector3.ZERO
 var center_vp := Vector2.ZERO
 var point_pos := Vector2.ZERO
-
-func _draw():
-    # print(center_vp)
-    draw_circle(center_vp, 75, Color.RED)
 
 func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
     show_result(image, result)
     call_deferred("_apply_mediapipe_update", result)
 
 func _apply_mediapipe_update(result):    
-    update_from_mediapipe(result)
-    queue_redraw() 
+    update_from_mediapipe(result) 
 
 func _ready() -> void:
     var file := get_model(task_file)
@@ -80,10 +73,7 @@ func calcluate_effect() -> void:
         print("Effect: Fire!")
 
 func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
-    left_hand_landmarks.clear()
-    right_hand_landmarks.clear()
-
-    assert(result.gestures.size() == result.handedness.size())
+    # assert(result.gestures.size() == result.handedness.size())
     for i in range(result.gestures.size()):
         var hand_lms = result.hand_landmarks[i].landmarks
 
@@ -91,39 +81,26 @@ func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
         for j in range(hand_lms.size()):
             var lm = hand_lms[j]
             hand_array.append(Vector3(lm.x, lm.y, lm.z))
-
-        var handedness := result.handedness[i] 
-        var classification_hand := handedness.categories[0]
-        var hand_label: String = classification_hand.category_name
-        if hand_label == "Left":
-            left_hand_landmarks = hand_array
+        
+        if arr_gestures_name.back() == "flat":
+            center_pos = calculate_hand_center(hand_array)
+            if viewport is SubViewport:
+                center_vp = Vector2((1.0 - center_pos.x) * viewport.size.x, center_pos.y * viewport.size.y) 
+                overlay.set_allow_redraw(true)
+                overlay.set_center(center_vp) 
         else:
-            right_hand_landmarks = hand_array
-        
-        center_pos = calculate_hand_center()
-        center_vp = Vector2((1.0 - center_pos.x) * vp.size.x, center_pos.y * vp.size.y)  
-
-func calculate_hand_center() -> Vector3: 
+            overlay.set_allow_redraw(false)
+func calculate_hand_center(hand_array) -> Vector3: 
     var result := Vector3.ZERO
-    if left_hand_landmarks.size() > 0:
-        for i in left_hand_landmarks:
-            result.x += i.x
-            result.y += i.y
-            result.z += i.z
+    var palm := [hand_array[0], hand_array[1], hand_array[5], hand_array[9], hand_array[13], hand_array[17]]
+    
+    for i in palm:
+        result.x += i.x
+        result.y += i.y
+        result.z += i.z
+    
+    result.x = result.x / palm.size()
+    result.y = result.y / palm.size()
+    result.z = result.z / palm.size()
 
-        result.x = result.x / left_hand_landmarks.size()
-        result.y = result.y / left_hand_landmarks.size()
-        result.z = result.z / left_hand_landmarks.size()
-        
-        return result
-    else:
-        for i in right_hand_landmarks:
-            result.x += i.x
-            result.y += i.y
-            result.z += i.z
-
-        result.x = result.x / left_hand_landmarks.size()
-        result.y = result.y / left_hand_landmarks.size()
-        result.z = result.z / left_hand_landmarks.size()
-        
-        return result
+    return result
