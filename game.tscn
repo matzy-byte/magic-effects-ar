@@ -198,4 +198,5 @@ stream = ExtResource("6_ryrav")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 [connection signal="pressed" from="game_ui/exit_button" to="game_ui" method="_on_exit_button_pressed"]
+[connection signal="effect_triggered" from="SubViewport/Control" to="." method="_on_control_effect_triggered"]
 [connection signal="body_entered" from="enemy_area" to="." method="_on_enemy_hit"]

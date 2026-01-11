@@ -7,6 +7,26 @@ var renderer: MediaPipeHandRenderer
 var arr_gestures: Array = []
 var arr_gestures_name := []
 
+var fire_effect := ["metal", "cross", "c", "flat"]
+var water_effect := ["heart", "okay", "cross", "flat"]
+var lightning_effect := ["point", "okay", "call", "flat"]
+var earth_effect := ["c", "metal", "okay", "flat"]
+var light_effect := ["point", "call", "cross", "flat"]
+var fog_effect := ["heart", "greetings", "c", "flat"]
+var ghost := ["call", "greetings", "heart", "flat"]
+
+enum EffectType {
+    FIRE, 
+    WATER,
+    LIGHTNING,
+    EARTH,
+    LIGHT,
+    FOG,
+    GHOST
+}
+
+signal effect_triggered(effect_type: EffectType)
+
 var center_pos := Vector3.ZERO
 var center_vp := Vector2.ZERO
 var point_pos := Vector2.ZERO
@@ -47,10 +67,11 @@ func show_result(_image: MediaPipeImage, result: MediaPipeGestureRecognizerResul
         var gesture_score: float = classification_gesture.score
         
         var gesture_name = gesture_label.split(" ")[0]
-        if arr_gestures.back() != gesture_label:
+        if arr_gestures_name.back() == "flat":
             calcluate_effect()
-            if len(arr_gestures) > 10:
-                arr_gestures.clear()
+        if arr_gestures.back() != gesture_label:
+            if len(arr_gestures) >= 10:
+                arr_gestures.pop_at(0)
             arr_gestures.append(gesture_label)
             arr_gestures_name.append(gesture_name)
             print(arr_gestures_name.back())
@@ -66,12 +87,25 @@ func get_model(path: String) -> FileAccess:
     return null
 
 func calcluate_effect() -> void:
-    var fire_effect := ["fist", "point"]
+    var current_gestures = arr_gestures_name.slice(-4)
+    match current_gestures:
+        fire_effect:
+            call_deferred("_emit_effect", EffectType.FIRE)
+        water_effect:
+            call_deferred("_emit_effect", EffectType.WATER)
+        lightning_effect: 
+            call_deferred("_emit_effect", EffectType.LIGHTNING)
+        earth_effect: 
+            call_deferred("_emit_effect", EffectType.EARTH)
+        light_effect: 
+            call_deferred("_emit_effect", EffectType.LIGHT)
+        fog_effect: 
+            call_deferred("_emit_effect", EffectType.FOG)
+        ghost: 
+            call_deferred("_emit_effect", EffectType.GHOST)
 
-    # print(arr_gestures_name.slice(-2))
-    if arr_gestures_name.slice(-2) == fire_effect:
-        print("Effect: Fire!")
-
+func _emit_effect(effect: EffectType) -> void:
+    effect_triggered.emit(effect)
 func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
     # assert(result.gestures.size() == result.handedness.size())
     for i in range(result.gestures.size()):

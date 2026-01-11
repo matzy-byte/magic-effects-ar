@@ -8,6 +8,15 @@ extends Node3D
 @export var enemy_hit_sound : AudioStreamPlayer3D
 
 var spells : Array
+enum EffectType {
+    FIRE, 
+    WATER,
+    LIGHTNING,
+    EARTH,
+    LIGHT,
+    FOG,
+    GHOST
+}
 
 func _ready() -> void:
 	timer.start()
@@ -31,3 +40,19 @@ func _on_enemy_hit(body: Node3D) -> void:
 		var spell := body as Spell
 		spell._destroy()
 
+func _on_control_effect_triggered(effect_type: EffectType):
+	match effect_type:
+		EffectType.FIRE:
+			print("fire!")
+		EffectType.WATER:
+			print("water!")
+		EffectType.LIGHTNING:
+			print("lightning!")
+		EffectType.EARTH:
+			print("earth!")
+		EffectType.LIGHT:
+			print("light!")
+		EffectType.FOG:
+			print("fog!")
+		EffectType.GHOST:
+			print("ghost!")
