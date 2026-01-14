@@ -4,16 +4,13 @@ extends Area3D
 @export var spell_sound : AudioStreamPlayer3D
 @export var spell_type : int
 
-var active_spell := false
-
 var target_origin: Vector3
-var follow_speed := 30.0
+var follow_speed := 32.0
 
 func _process(delta):
     position = position.lerp(target_origin, follow_speed * delta)
 
 func _initialize(type: int, origin: Vector3) -> void:
-    active_spell = true
     position = Vector3(origin.x, origin.y, -1.5)
     spell_type = 0
     var stream = AudioStream.new()
@@ -35,6 +32,5 @@ func _initialize(type: int, origin: Vector3) -> void:
     # spell_sound.play()
 
 func _destroy():
-    active_spell = false
     queue_free()
 

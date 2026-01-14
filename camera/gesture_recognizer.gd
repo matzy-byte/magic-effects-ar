@@ -129,12 +129,13 @@ func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
             center_pos = calculate_hand_center(hand_array)
             game.latest_center_pos = center_pos
 
-            if viewport is SubViewport:
-                center_vp = Vector2((1.0 - center_pos.x) * viewport.size.x, center_pos.y * viewport.size.y) 
-                overlay.set_allow_redraw(true)
-                overlay.set_center(center_vp) 
-        else:
-            overlay.set_allow_redraw(false)
+            # if viewport is SubViewport:
+            #     center_vp = Vector2((1.0 - center_pos.x) * viewport.size.x, center_pos.y * viewport.size.y) 
+            #     overlay.set_allow_redraw(true)
+            #     overlay.set_center(center_vp) 
+        elif arr_gestures_name.back() == "fist" and game.spell_active:
+            game._deactivate_spell()
+            # overlay.set_allow_redraw(false)
 
 func calculate_hand_center(hand_array) -> Vector3: 
     var result := Vector3.ZERO
@@ -149,8 +150,8 @@ func calculate_hand_center(hand_array) -> Vector3:
     result.y = result.y / palm.size()
     result.z = result.z / palm.size()
 
-    var minimum := Vector3(1.5, 0.5, -1.5)
-    var maximum := Vector3(-1.5, -0.5, -1.5)
+    var minimum := Vector3(2, 0.5, -1)
+    var maximum := Vector3(-2, -0.5, -1)
 
     result.x = minimum.x + (maximum.x - minimum.x) * result.x
     result.y = minimum.y + (maximum.y - minimum.y) * result.y
