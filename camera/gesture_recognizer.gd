@@ -1,11 +1,14 @@
 extends WebCamera
 
+@onready var game := get_node("/root/game")
+
 var task: MediaPipeGestureRecognizer
 var task_file := "camera/gesture_recognizer.task"
 var renderer: MediaPipeHandRenderer
 
 var arr_gestures: Array = []
 var arr_gestures_name := []
+var last_effect = null
 
 var fire_effect := ["metal", "cross", "c", "flat"]
 var water_effect := ["heart", "okay", "cross", "flat"]
@@ -88,24 +91,30 @@ func get_model(path: String) -> FileAccess:
 
 func calcluate_effect() -> void:
     var current_gestures = arr_gestures_name.slice(-4)
-    match current_gestures:
-        fire_effect:
-            call_deferred("_emit_effect", EffectType.FIRE)
-        water_effect:
-            call_deferred("_emit_effect", EffectType.WATER)
-        lightning_effect: 
-            call_deferred("_emit_effect", EffectType.LIGHTNING)
-        earth_effect: 
-            call_deferred("_emit_effect", EffectType.EARTH)
-        light_effect: 
-            call_deferred("_emit_effect", EffectType.LIGHT)
-        fog_effect: 
-            call_deferred("_emit_effect", EffectType.FOG)
-        ghost: 
-            call_deferred("_emit_effect", EffectType.GHOST)
+    var new_effect = null
 
-func _emit_effect(effect: EffectType) -> void:
-    effect_triggered.emit(effect)
+    match current_gestures:
+        fire_effect: 
+            new_effect = EffectType.FIRE
+        water_effect:
+            new_effect = EffectType.WATER
+        lightning_effect: 
+            new_effect = EffectType.LIGHTNING
+        earth_effect: 
+            new_effect = EffectType.EARTH
+        light_effect: 
+            new_effect = EffectType.LIGHT
+        fog_effect: 
+            new_effect = EffectType.FOG
+        ghost: 
+            new_effect = EffectType.GHOST
+    
+    if new_effect != null and new_effect != last_effect:
+        last_effect = new_effect
+        call_deferred("_emit_effect", new_effect, center_pos)
+
+func _emit_effect(effect: EffectType, origin: Vector3) -> void:
+    effect_triggered.emit(effect, origin)
 func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
     # assert(result.gestures.size() == result.handedness.size())
     for i in range(result.gestures.size()):
@@ -118,12 +127,15 @@ func update_from_mediapipe(result: MediaPipeGestureRecognizerResult):
         
         if arr_gestures_name.back() == "flat":
             center_pos = calculate_hand_center(hand_array)
+            game.latest_center_pos = center_pos
+
             if viewport is SubViewport:
                 center_vp = Vector2((1.0 - center_pos.x) * viewport.size.x, center_pos.y * viewport.size.y) 
                 overlay.set_allow_redraw(true)
                 overlay.set_center(center_vp) 
         else:
             overlay.set_allow_redraw(false)
+
 func calculate_hand_center(hand_array) -> Vector3: 
     var result := Vector3.ZERO
     var palm := [hand_array[0], hand_array[1], hand_array[5], hand_array[9], hand_array[13], hand_array[17]]
@@ -136,5 +148,12 @@ func calculate_hand_center(hand_array) -> Vector3:
     result.x = result.x / palm.size()
     result.y = result.y / palm.size()
     result.z = result.z / palm.size()
+
+    var minimum := Vector3(1.5, 0.5, -1.5)
+    var maximum := Vector3(-1.5, -0.5, -1.5)
+
+    result.x = minimum.x + (maximum.x - minimum.x) * result.x
+    result.y = minimum.y + (maximum.y - minimum.y) * result.y
+    result.z = minimum.z + (maximum.z - minimum.z) * result.z
 
     return result

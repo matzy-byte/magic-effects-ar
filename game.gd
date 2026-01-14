@@ -7,6 +7,9 @@ extends Node3D
 @export var enemy : CharacterBody3D
 @export var enemy_hit_sound : AudioStreamPlayer3D
 
+var active_spell : Spell
+var latest_center_pos: Vector3
+
 var spells : Array
 enum EffectType {
     FIRE, 
@@ -20,6 +23,10 @@ enum EffectType {
 
 func _ready() -> void:
 	timer.start()
+
+func _process(_delta):
+	if active_spell:
+		active_spell.target_origin = latest_center_pos
 
 func _on_timer_timeout() -> void:
 	time -= 1
@@ -40,9 +47,18 @@ func _on_enemy_hit(body: Node3D) -> void:
 		var spell := body as Spell
 		spell._destroy()
 
-func _on_control_effect_triggered(effect_type: EffectType):
+func _on_control_effect_triggered(effect_type: EffectType, origin: Vector3):
+	if active_spell:
+		active_spell.queue_free()
+
+	var scene = load("res://spell/spell.tscn")
+	var instance = scene.instantiate() as Spell
+	add_child(instance)
+	active_spell = instance
+	
 	match effect_type:
 		EffectType.FIRE:
+			active_spell._initialize(0, origin)
 			print("fire!")
 		EffectType.WATER:
 			print("water!")
