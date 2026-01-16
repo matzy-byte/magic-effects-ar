@@ -8,7 +8,7 @@ var renderer: MediaPipeHandRenderer
 
 var gesture_history: Array[String] = []
 var last_effect: EffectType = -1
-var max_skips = 3
+var max_skips = 5
 
 enum EffectType {
 	FIRE,
@@ -142,8 +142,8 @@ func _calculate_hand_center(hand: Array[Vector3]) -> Vector3:
 
 	center /= palm_indices.size()
 
-	var min := Vector3(3, 1.6, -2)
-	var max := Vector3(-3, -1.6, -2)
+	var min := Vector3(4, 2.25, -2)
+	var max := Vector3(-4, -2.25, -2)
 
 	center.x = min.x + (max.x - min.x) * center.x
 	center.y = min.y + (max.y - min.y) * center.y

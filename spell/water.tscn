@@ -1,0 +1,110 @@
+[gd_scene load_steps=13 format=3 uid="uid://det4bnro6exjo"]
+
+[ext_resource type="Script" uid="uid://dleg415eex6w" path="res://spell/effect.gd" id="1_mivgc"]
+[ext_resource type="Shader" uid="uid://dsfovipvb1dv0" path="res://spell/water/water.gdshader" id="1_xkfgv"]
+[ext_resource type="Texture2D" uid="uid://bk1vlqmt5844u" path="res://spell/water/water_anim_texture.tres" id="2_yn4h8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ir3xi"]
+render_priority = 0
+shader = ExtResource("1_xkfgv")
+shader_parameter/albedo_tex = ExtResource("2_yn4h8")
+shader_parameter/deform_amplitude = 0.41
+shader_parameter/deform_speed = 1.5
+shader_parameter/noise_scale = 2.0
+shader_parameter/rim_color = Vector3(0.5, 0.8, 1)
+shader_parameter/rim_power = 2.5
+shader_parameter/alpha = 0.85
+shader_parameter/use_vertex_color = true
+
+[sub_resource type="SphereMesh" id="SphereMesh_4b8md"]
+material = SubResource("ShaderMaterial_ir3xi")
+radius = 1.0
+height = 2.0
+radial_segments = 32
+rings = 16
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mivgc"]
+render_priority = 0
+shader = ExtResource("1_xkfgv")
+shader_parameter/albedo_tex = ExtResource("2_yn4h8")
+shader_parameter/deform_amplitude = 0.28
+shader_parameter/deform_speed = 1.5
+shader_parameter/noise_scale = 2.0
+shader_parameter/rim_color = Vector3(0.5, 0.8, 1)
+shader_parameter/rim_power = 2.5
+shader_parameter/alpha = 0.85
+shader_parameter/use_vertex_color = true
+
+[sub_resource type="SphereMesh" id="SphereMesh_xkfgv"]
+material = SubResource("ShaderMaterial_mivgc")
+radius = 0.25
+height = 0.5
+
+[sub_resource type="Curve" id="Curve_yn4h8"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.5038167), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_yn4h8"]
+offsets = PackedFloat32Array(0.7113821, 0.95528454)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="Animation" id="Animation_up5fc"]
+resource_name = "init"
+length = 0.25
+step = 0.0
+tracks/0/type = "scale_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.25, 1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_ujnui"]
+length = 0.001
+tracks/0/type = "scale_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 1, 1, 1)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0v0kk"]
+_data = {
+&"RESET": SubResource("Animation_ujnui"),
+&"init": SubResource("Animation_up5fc")
+}
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_mivgc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_4b8md")
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
+amount = 25
+lifetime = 5.0
+preprocess = 2.0
+mesh = SubResource("SphereMesh_xkfgv")
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 0.1, 0)
+initial_velocity_min = 0.02
+initial_velocity_max = 0.02
+angular_velocity_min = 10.0
+angular_velocity_max = 10.0
+radial_accel_min = -20.0
+radial_accel_max = -20.0
+tangential_accel_min = 1.5
+tangential_accel_max = 3.0
+scale_amount_min = 0.25
+scale_amount_curve = SubResource("Curve_yn4h8")
+color_ramp = SubResource("Gradient_yn4h8")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_0v0kk")
+}
