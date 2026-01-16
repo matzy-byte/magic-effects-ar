@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://1wuuuya1chuf"]
+[gd_scene load_steps=6 format=3 uid="uid://1wuuuya1chuf"]
 
 [ext_resource type="Script" uid="uid://beeb55p4bvl1b" path="res://spell/spell.gd" id="1_cbdtr"]
 [ext_resource type="AudioStream" uid="uid://cf1nt5f8yrre2" path="res://audio/fire_sfx.wav" id="2_aojo6"]
@@ -7,9 +7,13 @@
 
 [sub_resource type="SphereMesh" id="SphereMesh_cbdtr"]
 
-[node name="spell" type="Area3D"]
+[sub_resource type="QuadMesh" id="QuadMesh_cbdtr"]
+size = Vector2(0.25, 0.25)
+
+[node name="spell" type="Area3D" node_paths=PackedStringArray("spell_sound")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 script = ExtResource("1_cbdtr")
+spell_sound = NodePath("spell_sound")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_m3f8a")
@@ -20,3 +24,11 @@ max_distance = 3.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_cbdtr")
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
+mesh = SubResource("QuadMesh_cbdtr")
+direction = Vector3(0, 1, 0)
+spread = 22.5
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
