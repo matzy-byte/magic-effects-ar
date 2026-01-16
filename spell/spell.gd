@@ -18,6 +18,10 @@ func _initialize(type: int, origin: Vector3) -> void:
 
 	match type:
 		0:
+			var scene = load("res://spell/fire.tscn")
+			var instance = scene.instantiate()
+			add_child(instance)
+			effect = instance
 			spell_sound.stream = load("res://audio/fire_sfx.wav")
 		1:
 			var scene = load("res://spell/water.tscn")
@@ -32,8 +36,16 @@ func _initialize(type: int, origin: Vector3) -> void:
 			effect = instance
 			spell_sound.stream = load("res://audio/electrical_sfx.wav")
 		3:
+			var scene = load("res://spell/earth.tscn")
+			var instance = scene.instantiate()
+			add_child(instance)
+			effect = instance
 			spell_sound.stream = load("res://audio/earth_sfx.wav")
 		4:
+			var scene = load("res://spell/light.tscn")
+			var instance = scene.instantiate()
+			add_child(instance)
+			effect = instance
 			spell_sound.stream = load("res://audio/light_sfx.wav")
 		5:
 			var scene = load("res://spell/fog.tscn")
