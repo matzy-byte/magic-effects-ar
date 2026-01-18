@@ -55,7 +55,7 @@ func _process_camera(image: MediaPipeImage, timestamp_ms: int) -> void:
 		task.recognize_async(image, timestamp_ms)
 
 
-func _result_callback(result: MediaPipeGestureRecognizerResult, image: MediaPipeImage, _timestamp_ms: int) -> void:
+func _result_callback(result: MediaPipeGestureRecognizerResult, _image: MediaPipeImage, _timestamp_ms: int) -> void:
 	_handle_gestures(result)
 	call_deferred("_update_from_mediapipe", result)
 
@@ -142,11 +142,11 @@ func _calculate_hand_center(hand: Array[Vector3]) -> Vector3:
 
 	center /= palm_indices.size()
 
-	var min := Vector3(4, 2.25, -2)
-	var max := Vector3(-4, -2.25, -2)
+	var minimum := Vector3(4, 2.25, -2)
+	var maximum := Vector3(-4, -2.25, -2)
 
-	center.x = min.x + (max.x - min.x) * center.x
-	center.y = min.y + (max.y - min.y) * center.y
-	center.z = min.z + (max.z - min.z) * center.z
+	center.x = minimum.x + (maximum.x - minimum.x) * center.x
+	center.y = minimum.y + (maximum.y - minimum.y) * center.y
+	center.z = minimum.z + (maximum.z - minimum.z) * center.z
 
 	return center
