@@ -64,12 +64,15 @@ func _handle_gestures(result: MediaPipeGestureRecognizerResult) -> void:
 	for i in result.gestures.size():
 		var gesture_label: String = result.gestures[i].categories[0].category_name
 		var gesture_name := gesture_label.split(" ")[0]
+		var score: float = result.gestures[i].categories[0].score
 
 		if gesture_history.is_empty() or gesture_history.back() != gesture_name:
 			if gesture_history.size() >= 10:
 				gesture_history.pop_front()
-			gesture_history.append(gesture_name)
-			print(gesture_name)
+			if score >= 0.75:
+				gesture_history.append(gesture_name)
+				print(gesture_name)
+				print(score)
 
 		if gesture_name == "flat":
 			_calculate_effect()
